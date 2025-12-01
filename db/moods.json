@@ -1,0 +1,206 @@
+[
+  {
+    "date": "2025-11-21T14:58:53.939Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "score": 8,
+    "emotion": "happiness"
+  },
+  {
+    "date": "2025-11-21T14:59:00.446Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "score": -1,
+    "emotion": "stress"
+  },
+  {
+    "date": "2025-11-21T14:59:13.781Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "score": -1,
+    "emotion": "stress"
+  },
+  {
+    "date": "2025-11-21T15:03:36.917Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "score": 8,
+    "emotion": "happiness"
+  },
+  {
+    "date": "2025-11-21T15:07:05.450Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:07:10.567Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:20:46.824Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:21:09.765Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:32:35.350Z",
+    "message": "I feel happy and calm today.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 5,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:32:37.886Z",
+    "message": "I'm stressed and feeling low.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:42:01.052Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:42:06.171Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:43:41.426Z",
+    "message": "my girlfriend broke up with me",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "neutral",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T15:46:52.507Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T17:16:58.173Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-21T17:17:02.162Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-23T16:37:09.435Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-23T16:37:13.764Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-23T16:39:22.093Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-26T02:49:37.688Z",
+    "message": "I feel calm, grateful and happy today. Things are going well.",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "happiness",
+    "score": 8,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-26T02:49:49.422Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-26T02:50:05.723Z",
+    "message": "my girlfriend is very horny",
+    "sentiment": "neutral",
+    "intensity": "neutral",
+    "emotion": "neutral",
+    "score": 0,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-26T02:50:22.895Z",
+    "message": "my girlfriend is sexy",
+    "sentiment": "positive",
+    "intensity": "strong-positive",
+    "emotion": "neutral",
+    "score": 3,
+    "crisis": false
+  },
+  {
+    "date": "2025-11-28T05:25:00.641Z",
+    "message": "I'm stressed, overwhelmed and feeling low. Nothing seems to work.",
+    "sentiment": "negative",
+    "intensity": "mild-negative",
+    "emotion": "sadness",
+    "score": -1,
+    "crisis": false
+  }
+]
