@@ -1,198 +1,222 @@
-// ------------------------------------------------------
-//  ENV + Dependencies
-// ------------------------------------------------------
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import mysql from "mysql2";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import axios from "axios";
 
-const express = require("express");
-const cors = require("cors");
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
-const mysql = require("mysql2/promise");
-
-// --------- AI: Groq (Llama 3.1) ---------
-const Groq = require("groq-sdk");
-const groq = new Groq({ apiKey: process.env.GROQ_KEY });
-
-// ------------------------------------------------------
-//  MySQL Database Connection
-// ------------------------------------------------------
-const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "sentibot"
-});
-
-// ------------------------------------------------------
-//  Express Setup
-// ------------------------------------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ------------------------------------------------------
-//  *************** USER AUTH ***************
-// ------------------------------------------------------
+// --------------------------------------
+// MYSQL CONNECTION
+// --------------------------------------
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "sentibot",
+});
 
-// REGISTER NEW USER
-app.post("/api/register", async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      password,
-      dateOfBirth,
+db.connect((err) => {
+  if (err) console.log("MySQL Error:", err);
+  else console.log("✅ MySQL Connected");
+});
+
+// --------------------------------------
+// JWT SECRET
+// --------------------------------------
+const SECRET = "SENTIBOT_SECRET_KEY";
+
+// --------------------------------------
+// REGISTER USER
+// --------------------------------------
+app.post("/api/register", (req, res) => {
+  const { name, email, password } = req.body;
+  const hash = bcrypt.hashSync(password, 10);
+
+  db.query(
+    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+    [name, email, hash],
+    (err) => {
+      if (err) return res.status(400).json({ error: "Email already exists" });
+
+      res.json({ message: "Registered successfully" });
+    }
+  );
+});
+
+// --------------------------------------
+// LOGIN USER
+// --------------------------------------
+app.post("/api/login", (req, res) => {
+  const { email, password } = req.body;
+
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, rows) => {
+    if (err || rows.length === 0)
+      return res.status(400).json({ error: "User not found" });
+
+    const user = rows[0];
+
+    if (!bcrypt.compareSync(password, user.password))
+      return res.status(400).json({ error: "Wrong password" });
+
+    const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: "1d" });
+
+    res.json({ token, user });
+  });
+});
+
+// --------------------------------------
+// UPDATE PROFILE
+// --------------------------------------
+app.put("/api/update-profile", (req, res) => {
+  const {
+    id,
+    city,
+    skills,
+    experience,
+    career_goal,
+    date_of_birth,
+    qualification,
+  } = req.body;
+
+  db.query(
+    `UPDATE users SET 
+      city=?, skills=?, experience=?, career_goal=?, date_of_birth=?, qualification=?
+     WHERE id=?`,
+    [
       city,
       skills,
       experience,
-      careerGoal,
-      qualification
-    } = req.body;
+      career_goal,
+      date_of_birth,
+      qualification,
+      id,
+    ],
+    (err) => {
+      if (err) return res.status(500).json({ error: "Update failed" });
 
-    const [exists] = await db.query("SELECT id FROM users WHERE email = ?", [
-      email
-    ]);
-
-    if (exists.length > 0)
-      return res.status(409).json({ error: "Email already registered." });
-
-    await db.query(
-      `INSERT INTO users 
-      (name,email,password,date_of_birth,city,skills,experience,career_goal,qualification)
-      VALUES (?,?,?,?,?,?,?,?,?)`,
-      [
-        name,
-        email,
-        password,
-        dateOfBirth,
-        city,
-        skills || "",
-        experience || "",
-        careerGoal || "",
-        qualification || ""
-      ]
-    );
-
-    return res.json({ message: "Account created successfully!" });
-  } catch (err) {
-    console.log("Register error:", err);
-    return res.status(500).json({ error: "Server error" });
-  }
+      res.json({ message: "Profile updated successfully" });
+    }
+  );
 });
 
-// LOGIN
-app.post("/api/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// --------------------------------------
+// SENTIBOT — Emotion Detector
+// --------------------------------------
+function detectEmotion(text) {
+  const t = text.toLowerCase();
 
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [
-      email
-    ]);
+  const sadWords = ["sad", "depressed", "lonely", "hurt", "cry", "upset"];
+  const happyWords = ["happy", "joy", "good", "great", "awesome"];
 
-    if (rows.length === 0)
-      return res.status(401).json({ error: "Invalid email or password" });
+  if (sadWords.some((w) => t.includes(w))) return "sad";
+  if (happyWords.some((w) => t.includes(w))) return "happy";
+  return "neutral";
+}
 
-    const user = rows[0];
-    if (user.password !== password)
-      return res.status(401).json({ error: "Invalid email or password" });
+app.post("/api/chat", (req, res) => {
+  const { message } = req.body;
+  const mood = detectEmotion(message);
 
-    delete user.password;
+  let reply = [];
 
-    return res.json({ message: "Login success", user });
-  } catch (err) {
-    return res.status(500).json({ error: "Server error" });
+  if (mood === "sad") {
+    reply = [
+      "I'm really sorry you're feeling this way 💙 You're not alone — I'm here for you.",
+      "✨ “Every storm runs out of rain.” — Maya Angelou",
+      "📍 Nearby Psychiatrist (Bangalore): NIMHANS Hospital, Cadabams Hospital",
+      "☎ 24/7 Mental Health Helpline (India): 1800-599-0019",
+      "Would you like to talk about what made you feel this way?",
+    ];
+  } else if (mood === "happy") {
+    reply = [
+      "That's amazing! I'm really happy for you! 😄",
+      "🎉 Keep spreading positivity!",
+      "✨ “Success is small efforts repeated daily.”",
+      "What made your day so good?",
+    ];
+  } else {
+    reply = ["I hear you. Tell me more!", "I'm here to listen and support you 😊"];
   }
+
+  res.json({ replies: reply });
 });
 
-// UPDATE PROFILE
-app.put("/api/update-profile/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const { name, city, skills, experience, qualification, career_goal, date_of_birth } = req.body;
-
-    await db.query(
-      `UPDATE users SET name=?, city=?, skills=?, experience=?, qualification=?, career_goal=?, date_of_birth=?
-       WHERE id=?`,
-      [name, city, skills, experience, qualification, career_goal, date_of_birth, id]
-    );
-
-    return res.json({ success: true });
-  } catch (err) {
-    console.log("Update error:", err);
-    return res.status(500).json({ error: "Server error" });
-  }
-});
-
-// ------------------------------------------------------
-//  CHATBOT WITH PERSONALIZATION
-// ------------------------------------------------------
-app.post("/sentiment", async (req, res) => {
-  try {
-    const { message, user } = req.body;
-
-    const ai = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        {
-          role: "system",
-          content: `
-You are SentiBot, a friendly mentor chatbot.
-Personalize every reply using the user's profile:
-
-Name: ${user?.name}
-City: ${user?.city}
-Skills: ${user?.skills}
-Experience: ${user?.experience}
-Qualification: ${user?.qualification}
-Career Goal: ${user?.career_goal}
-
-Always respond in a warm, short, supportive, helpful tone.
-          `
-        },
-        { role: "user", content: message }
-      ]
-    });
-
-    const reply = ai.choices[0].message.content;
-
-    return res.json({ reply });
-  } catch (err) {
-    console.log("Chatbot error:", err);
-    return res.status(500).json({ error: "AI failed" });
-  }
-});
-
-// ------------------------------------------------------
-//  Job Search API
-// ------------------------------------------------------
-const RAPID_KEY = process.env.RAPID_KEY;
-
+// --------------------------------------
+// JOB SEARCH (Manual Search)
+// --------------------------------------
 app.post("/api/rapid-jobs", async (req, res) => {
+  const { company, page } = req.body;
+
   try {
-    const { company } = req.body;
-
-    const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(
-      company
-    )}%20jobs&num_pages=1`;
-
-    const response = await axios.get(url, {
+    const response = await axios.get("https://jsearch.p.rapidapi.com/search", {
+      params: {
+        query: `${company} jobs`,
+        page: page || 1,
+        num_pages: 1,
+        country: "in",
+        date_posted: "all",
+      },
       headers: {
-        "x-rapidapi-key": RAPID_KEY,
-        "x-rapidapi-host": "jsearch.p.rapidapi.com"
-      }
+        "X-RapidAPI-Key": "bb7df9e965msh87e830fed678f30p10d7efjsna8808403e763",
+        "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
+      },
     });
 
     res.json({
       found: true,
-      jobs: response.data.data
+      jobs: response.data.data || [],
     });
   } catch (err) {
-    return res.status(500).json({ error: "Job search failed" });
+    console.log("RapidAPI Error:", err.response?.data || err.message);
+    res.json({ found: false, jobs: [], error: "API error" });
   }
 });
 
-// ------------------------------------------------------
-app.listen(3000, () =>
-  console.log("Backend running → http://localhost:3000")
-);
+// --------------------------------------
+// AUTO-MATCH JOBS (Qualification + Experience + Skills)
+// With PAGINATION
+// --------------------------------------
+app.post("/api/auto-jobs", async (req, res) => {
+  const { qualification, experience, skills, page } = req.body;
+
+  let query = `${qualification} ${experience} jobs`;
+
+  if (skills && skills.trim()) {
+    query = `${skills} ${qualification} fresher jobs`;
+  }
+
+  try {
+    const response = await axios.get("https://jsearch.p.rapidapi.com/search", {
+      params: {
+        query,
+        page: page || 1,
+        num_pages: 1,
+        country: "in",
+        date_posted: "all",
+      },
+      headers: {
+        "X-RapidAPI-Key": "bb7df9e965msh87e830fed678f30p10d7efjsna8808403e763",
+        "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
+      },
+    });
+
+    res.json({
+      success: true,
+      jobs: response.data.data || [],
+      nextPage: (page || 1) + 1,
+      prevPage: page > 1 ? page - 1 : null,
+    });
+  } catch (err) {
+    console.log("Auto Job Error:", err.message);
+    res.json({ success: false, jobs: [] });
+  }
+});
+
+// --------------------------------------
+// START SERVER
+// --------------------------------------
+app.listen(5000, () => console.log("🚀 SentiBot Server running on port 5000"));
